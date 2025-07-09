@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corazón Animado | I Love You</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 15px rgba(255, 0, 102, 0.7);
+            letter-spacing: 2px;
+            animation: glow 2s infinite alternate;
+        }
+
+        .heart-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 2.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            width: 200px;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        button:hover {
+            background: rgba(255, 0, 102, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 0, 102, 0.4);
+        }
+
+        .signature {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 0, 102, 0.7);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 0, 102, 0.9), 0 0 30px rgba(255, 0, 102, 0.7);
+            }
+        }
+
+        @keyframes pulse {
+            from {
+                transform: translate(-50%, -50%) scale(1);
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1.1);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px #ff0066;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .heart-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .message {
+                font-size: 1.7rem;
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>I Love You</h1>
+        
+        <div class="heart-container">
+            <canvas id="heartCanvas"></canvas>
+            <div class="message">I love You</div>
+        </div>
+        
+        <div class="controls">
+            <button id="restartBtn">Reiniciar Animación</button>
+            <button id="colorBtn">Cambiar Color</button>
+        </div>
+    </div>
+    
+    <div class="particles" id="particles"></div>
+    <div class="signature">Código con ❤️</div>
+
+    <script>
+        // Configuración del lienzo
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 500;
+        canvas.height = 500;
+        
+        // Variables de estado
+        let time = 0;
+        let animationId;
+        let heartColor = '#ff0066';
+        const particles = [];
+        
+        // Inicializar partículas flotantes
+        function initParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 100;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Propiedades aleatorias
+                const size = Math.random() * 5 + 1;
+                const posX = Math.random() * window.innerWidth;
+                const posY = Math.random() * window.innerHeight;
+                const animationDuration = Math.random() * 10 + 5;
+                const delay = Math.random() * 5;
+                const color = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 100 + 155)}, ${Math.random() * 0.5 + 0.3})`;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}px`;
+                particle.style.top = `${posY}px`;
+                particle.style.animationDuration = `${animationDuration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.backgroundColor = color;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Función para dibujar el corazón
+        function drawHeart(t) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const size = 180;
+            const beat = Math.sin(t * 5) * 0.1 + 1;
+            const currentSize = size * beat;
+            
+            ctx.beginPath();
+            
+            // Dibujar corazón con líneas
+            for (let angle = 0; angle < Math.PI * 2; angle += 0.01) {
+                const x = 16 * Math.pow(Math.sin(angle), 3);
+                const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle));
+                
+                const scale = currentSize / 16;
+                const px = centerX + x * scale;
+                const py = centerY + y * scale;
+                
+                if (angle === 0) {
+                    ctx.moveTo(px, py);
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            
+            ctx.closePath();
+            
+            // Crear degradado para el corazón
+            const gradient = ctx.createRadialGradient(
+                centerX, centerY, 0,
+                centerX, centerY, currentSize * 1.2
+            );
+            gradient.addColorStop(0, heartColor);
+            gradient.addColorStop(1, '#990033');
+            
+            // Estilo y trazo
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // Dibujar líneas internas
+            drawInternalLines(centerX, centerY, currentSize, t);
+        }
+        
+        // Dibujar líneas internas del corazón
+        function drawInternalLines(centerX, centerY, size, t) {
+            const numLines = 15;
+            const lineLength = size * 0.2;
+            const pulse = Math.sin(t * 8) * 0.5 + 0.5;
+            
+            for (let i = 0; i < numLines; i++) {
+                const angle = (i / numLines) * Math.PI * 2;
+                const variation = Math.sin(t * 3 + i * 0.5) * 0.2;
+                
+                const x1 = centerX + Math.cos(angle) * (size * 0.3 + variation * size * 0.1);
+                const y1 = centerY + Math.sin(angle) * (size * 0.3 + variation * size * 0.1);
+                
+                const x2 = centerX + Math.cos(angle) * (size * 0.3 + lineLength * pulse + variation * size * 0.1);
+                const y2 = centerY + Math.sin(angle) * (size * 0.3 + lineLength * pulse + variation * size * 0.1);
+                
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                
+                // Color de las líneas internas
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + pulse * 0.3})`;
+                ctx.lineWidth = 2 + pulse;
+                ctx.stroke();
+            }
+        }
+        
+        // Función de animación
+        function animate() {
+            time += 0.01;
+            drawHeart(time);
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // Reiniciar la animación
+        document.getElementById('restartBtn').addEventListener('click', function() {
+            cancelAnimationFrame(animationId);
+            time = 0;
+            animate();
+        });
+        
+        // Cambiar color del corazón
+        document.getElementById('colorBtn').addEventListener('click', function() {
+            const colors = ['#ff0066', '#ff6600', '#cc00ff', '#00ccff', '#ffcc00', '#66ff00'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            heartColor = randomColor;
+        });
+        
+        // Inicializar
+        initParticles();
+        animate();
+        
+        // Ajustar tamaño del canvas al cambiar el tamaño de la ventana
+        window.addEventListener('resize', function() {
+            canvas.width = document.querySelector('.heart-container').offsetWidth;
+            canvas.height = document.querySelector('.heart-container').offsetHeight;
+        });
+    </script>
+</body>
+</html>
